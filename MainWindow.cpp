@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QPixmap>
 #include <map>
+#include <QPixmap>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent) {
@@ -46,7 +47,16 @@ MainWindow::~MainWindow()
 void MainWindow::updateImage() {
     cv::Mat frame;
     (*m_camera) >> frame;
-    QImage i((uchar*)frame.datastart, frame.size().width, frame.size().height, m_formats[std::pair<int, int>(frame.depth(), frame.channels())]);
+
+    for (int i = 0; i < frame.size().width * frame.size().height * 3; i+=3) {
+        uchar b = frame.data[i];
+        uchar g = frame.data[i+1];
+        uchar r = frame.data[i+2];
+        frame.data[i] = r;
+        frame.data[i+2] = b;
+    }
+
+    QImage i(frame.ptr(), frame.size().width, frame.size().height, m_formats[std::pair<int, int>(frame.depth(), frame.channels())]);
     m_imgLabel->setPixmap(QPixmap::fromImage(i));
 }
 
