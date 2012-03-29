@@ -46,17 +46,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateImage() {
     cv::Mat frame;
+    cv::Mat rgbFrame;
     (*m_camera) >> frame;
 
-    for (int i = 0; i < frame.size().width * frame.size().height * 3; i+=3) {
-        uchar b = frame.data[i];
-        uchar g = frame.data[i+1];
-        uchar r = frame.data[i+2];
-        frame.data[i] = r;
-        frame.data[i+2] = b;
-    }
+    cv::cvtColor(frame, rgbFrame, CV_BGR2RGB);
 
-    QImage i(frame.ptr(), frame.size().width, frame.size().height, m_formats[std::pair<int, int>(frame.depth(), frame.channels())]);
+    QImage i(rgbFrame.ptr(), rgbFrame.size().width, rgbFrame.size().height, m_formats[std::pair<int, int>(rgbFrame.depth(), rgbFrame.channels())]);
     m_imgLabel->setPixmap(QPixmap::fromImage(i));
 }
 
